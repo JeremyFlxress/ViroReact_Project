@@ -1,0 +1,62 @@
+# assets/models/sensor.obj
+# Modelo 3D simple de un sensor
+# Creado para EnviroAR Monitor
+mtllib sensor.mtl
+
+# Definición de vértices
+v -0.5 -0.5 -0.5
+v -0.5 -0.5 0.5
+v -0.5 0.5 -0.5
+v -0.5 0.5 0.5
+v 0.5 -0.5 -0.5
+v 0.5 -0.5 0.5
+v 0.5 0.5 -0.5
+v 0.5 0.5 0.5
+
+# Definición de normales
+vn 0.0 0.0 1.0
+vn 0.0 0.0 -1.0
+vn 0.0 1.0 0.0
+vn 0.0 -1.0 0.0
+vn 1.0 0.0 0.0
+vn -1.0 0.0 0.0
+
+# Definición de caras
+# Frente
+usemtl Main
+f 1//2 7//2 5//2
+f 1//2 3//2 7//2
+# Atrás
+f 6//1 8//1 2//1
+f 2//1 8//1 4//1
+# Derecha
+f 5//5 7//5 6//5
+f 6//5 7//5 8//5
+# Izquierda
+f 2//6 4//6 1//6
+f 1//6 4//6 3//6
+# Arriba
+f 3//3 4//3 7//3
+f 4//3 8//3 7//3
+# Abajo
+f 1//4 5//4 2//4
+f 2//4 5//4 6//4
+
+# Componentes adicionales del sensor
+# Antena superior
+v 0.0 0.5 0.0
+v 0.0 1.0 0.0
+vn 0.0 1.0 0.0
+usemtl Antenna
+f 9//3 10//3 7//3
+f 9//3 7//3 8//3
+
+# Sensor circular frontal
+v 0.5 0.0 0.0
+v 0.6 0.0 0.0
+v 0.5 0.3 0.0
+v 0.6 0.3 0.0
+vn 1.0 0.0 0.0
+usemtl Sensor
+f 11//5 12//5 13//5
+f 12//5 14//5 13//5
