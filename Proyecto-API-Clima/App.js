@@ -2,19 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import * as Location from 'expo-location';
 
+// Clave de la API y URL base para obtener datos del clima
 const WEATHER_API_KEY = 'be0e503bfb1bbdcc1b49628f73af3cc1';
 const WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 export default function App() {
+  // Estados para manejar coordenadas, datos del clima, estados de carga y errores
   const [coords, setCoords] = useState(null);
   const [weather, setWeather] = useState(null);
   const [loadingLoc, setLoadingLoc] = useState(true);
   const [loadingWx, setLoadingWx] = useState(false);
   const [error, setError] = useState(null);
 
+  // useEffect para obtener permisos de ubicación y coordenadas del dispositivo
   useEffect(() => {
     (async () => {
       try {
+        // Solicita permisos para acceder a la ubicación
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           setError('Permiso de ubicación denegado');
@@ -22,8 +26,9 @@ export default function App() {
           return;
         }
 
+        // Obtiene la ubicación actual del dispositivo
         const location = await Location.getCurrentPositionAsync({});
-        setCoords(location.coords);
+        setCoords(location.coords); // Guarda las coordenadas en el estado
         setLoadingLoc(false);
       } catch (err) {
         console.warn('GPS ERROR', err);
@@ -33,18 +38,20 @@ export default function App() {
     })();
   }, []);
 
+  // useEffect para obtener datos del clima cuando las coordenadas están disponibles
   useEffect(() => {
     if (!coords) return;
 
     const fetchWeather = () => {
-      setLoadingWx(true);
+      setLoadingWx(true); // Indica que se está cargando el clima
       fetch(
         `${WEATHER_URL}?lat=${coords.latitude}&lon=${coords.longitude}` +
         `&units=metric&lang=es&appid=${WEATHER_API_KEY}`
       )
         .then(r => r.json())
         .then(json => {
-          if (json.cod !== 200) throw new Error(json.message);
+          if (json.cod !== 200) throw new Error(json.message); // Manejo de errores de la API
+          // Guarda los datos relevantes del clima en el estado
           setWeather({
             city: json.name,
             temp: json.main.temp.toFixed(1),
@@ -56,14 +63,15 @@ export default function App() {
           console.warn('WX ERROR', e);
           setError('Error al obtener clima');
         })
-        .finally(() => setLoadingWx(false));
+        .finally(() => setLoadingWx(false)); // Finaliza la carga del clima
     };
 
-    fetchWeather();
-    const interval = setInterval(fetchWeather, 60000); // Update every 60 seconds
-    return () => clearInterval(interval);
+    fetchWeather(); // Llama a la función para obtener el clima
+    const interval = setInterval(fetchWeather, 60000); // Actualiza cada 60 segundos
+    return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
   }, [coords]);
 
+  // Renderiza un indicador de carga mientras se obtiene la ubicación
   if (loadingLoc) {
     return (
       <View style={styles.center}>
@@ -72,6 +80,8 @@ export default function App() {
       </View>
     );
   }
+
+  // Renderiza un mensaje de error si ocurre algún problema
   if (error) {
     return (
       <View style={styles.center}>
@@ -79,6 +89,8 @@ export default function App() {
       </View>
     );
   }
+
+  // Renderiza un indicador de carga mientras se obtienen los datos del clima
   if (loadingWx) {
     return (
       <View style={styles.center}>
@@ -87,8 +99,11 @@ export default function App() {
       </View>
     );
   }
+
+  // Si no hay datos del clima, no renderiza nada
   if (!weather) return null;
 
+  // Renderiza los datos del clima obtenidos
   return (
     <View style={styles.container}>
       <Text style={styles.city}>{weather.city}</Text>
@@ -99,6 +114,7 @@ export default function App() {
   );
 }
 
+// Estilos para los componentes
 const styles = StyleSheet.create({
   container: {
     flex: 1,
