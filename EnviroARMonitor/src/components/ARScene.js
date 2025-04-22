@@ -74,11 +74,12 @@ const ARScene = ({ sensorData, lastUpdated, onTrackingUpdated }) => {
           
           {/* Modelo 3D del sensor (opcional) */}
           <Viro3DObject
-            source={require('../../assets/models/sensor.obj')}
-            resources={[require('../../assets/models/sensor.mtl')]}
+            source={require('../../assets/models/sensor.obj')} // Ensure this file exists
+            resources={[require('../../assets/models/sensor.mtl')]} // Ensure this file exists
             position={[0, -0.5, -1.5]}
             scale={[0.05, 0.05, 0.05]}
             type="OBJ"
+            onError={(error) => console.error('Error loading 3D model:', error)} // Log errors if the model fails to load
           />
         </ViroNode>
       </ViroARPlaneSelector>

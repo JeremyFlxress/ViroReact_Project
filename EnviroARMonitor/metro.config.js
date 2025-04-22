@@ -1,32 +1,12 @@
 // metro.config.js
-const { getDefaultConfig } = require('metro-config');
+const { getDefaultConfig } = require('expo/metro-config');
 
-module.exports = (async () => {
-  const defaultConfig = await getDefaultConfig();
-  
-  const { assetExts } = defaultConfig.resolver;
-  
-  return {
-    resolver: {
-      assetExts: [
-        ...assetExts,
-        'obj',
-        'mtl',
-        'fbx',
-        'glb',
-        'gltf',
-        'bin',
-        'arobject',
-        'gif',
-      ],
-    },
-    transformer: {
-      getTransformOptions: async () => ({
-        transform: {
-          experimentalImportSupport: false,
-          inlineRequires: true,
-        },
-      }),
-    },
-  };
-})();
+const defaultConfig = getDefaultConfig(__dirname);
+
+module.exports = {
+  ...defaultConfig,
+  resolver: {
+    ...defaultConfig.resolver,
+    // Ensure no deprecated modules are used
+  },
+};
