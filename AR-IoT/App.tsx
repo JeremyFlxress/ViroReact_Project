@@ -6,91 +6,54 @@ import {
   ViroNode,
   ViroTrackingReason,
   ViroTrackingStateConstants,
+  ViroARPlaneSelector,
 } from "@reactvision/react-viro";
 import { ViroMaterials } from "@reactvision/react-viro";
 import React, { useState } from "react";
-import { StyleSheet } from "react-native";
-
-const HelloWorldSceneAR = () => {
-  const [text, setText] = useState("Initializing AR...");
-
-  function onInitialized(state: any, reason: ViroTrackingReason) {
-    console.log("onInitialized", state, reason);
-    if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-      setText("EDUARDO CULON!");
-    } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
-      // Handle loss of tracking
-    }
-  }
-
-  ViroMaterials.createMaterials({
-    greenBox: {
-      diffuseColor: "white"
-    }
-  });
-
-  return (
-    <ViroARScene onTrackingUpdated={onInitialized}>
-      <ViroNode position={[0, 0, -5]}>
-        <ViroBox
-          style={styles.caja}
-          materials={["greenBox"]}
-          position={[0, 0, 0]}       // relativa al nodo
-          scale={[1, 1, 1]}
-        />
-
-        <ViroText
-          text="Texto sobre la caja"
-          scale={[0.1, 0.1, 0.1]}
-          position={[0, 0.5, 1]}     // 1.0 mitad de altura + margen
-          style={styles.helloWorldTextStyle}
-        />
-
-        <ViroText
-          text={text}
-          scale={[0.2, 0.2, 0.2]}
-          position={[0, -0.5, 1]}
-          style={styles.helloWorldTextStyle}
-        />
-      </ViroNode>
-    </ViroARScene>
-  );
-};
+import { StyleSheet, TouchableHighlight, View, TouchableOpacity, Text } from "react-native";
+import PanelAR from "./src/components/PanelAR";
 
 export default () => {
   return (
-    <ViroARSceneNavigator
-      autofocus={true}
-      initialScene={{
-        scene: HelloWorldSceneAR,
-      }}
-      style={styles.f1}
-    />
+    <View style={styles.container}>
+      <ViroARSceneNavigator
+        autofocus={true}
+        initialScene={{
+          scene: PanelAR,
+        }}
+        style={styles.f1}
+      />
+      <TouchableOpacity style={styles.floatingButton}>
+        <Text style={styles.buttonText}>Actualizar</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 
 var styles = StyleSheet.create({
-  f1: { flex: 1 },
-  helloWorldTextStyle: {
-    fontFamily: 'Segoe UI',
-    fontWeight: '900',
-    fontSize: 30,
-    color: 'red',
-    textAlignVertical: "center",
-    textAlign: "center",
-    borderColor: 'red',
-    borderWidth: 1,
-    width: 200,
+  container: {
+    flex: 1,
   },
-  textStyle: {
-    fontFamily: 'Segoe UI',
-    fontWeight: '900',
-    fontSize: 30,
-    color: 'black',
+  f1: { 
+    flex: 1 
   },
-  caja: {
-    height: 2,
-    width: 2,
+  floatingButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#3498db',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    elevation: 5, // Sombra en Android
+    shadowColor: '#000', // Sombra en iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 20,
   }
 });
