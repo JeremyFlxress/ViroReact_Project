@@ -72,7 +72,8 @@ const requestAndroidPermission = async () => {
         city: json.name.toUpperCase(),
         temp: json.main.temp.toFixed(1),
         humidity: json.main.humidity,
-        desc: json.weather[0].description
+        desc: json.weather[0].description,
+        estado: 'Activo'
       };
     } catch (err) {
       console.warn('WEATHER API ERROR', err);
