@@ -6,32 +6,17 @@ import {
   ViroAnimations,
 } from "@reactvision/react-viro";
 import { ViroMaterials } from "@reactvision/react-viro";
-import React, { useState, useEffect, useImperativeHandle } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { getCurrentLocation, fetchWeatherData } from '../api/ApiData';
 
-const PanelAR = ({estado, setEstado}) => {
+const PanelAR = () => {
 
   const [weather, setWeather] = useState({});
-  const [loadingLoc, setLoadingLoc] = useState(true);
   const [loadingWx, setLoadingWx] = useState(false);
-  const [error, setError] = useState(null);
   const [coords, setCoords] = useState(null);
   const [tempColor, setTempColor] = useState('lightblue');
-  const [estadoLocal, setEstadoLocal] = useState(estado);
-
-  useEffect(() => {
-    console.log("estado", estado);
-    if (estado) {
-      setLoadingLoc(true);
-      getLocation().then(() => {
-        if (coords) {
-          fetchAndSetWeather();
-        }
-      });
-      setEstado(false);
-    }
-  }, [estadoLocal]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getLocation();
@@ -40,7 +25,7 @@ const PanelAR = ({estado, setEstado}) => {
   useEffect(() => {
     if (!coords) return;
     fetchAndSetWeather();
-    const interval = setInterval(fetchAndSetWeather, 320000);
+    const interval = setInterval(fetchAndSetWeather, 32000);
     return () => clearInterval(interval);
   }, [coords]);
 
@@ -48,17 +33,16 @@ const PanelAR = ({estado, setEstado}) => {
     try {
       const coordinates = await getCurrentLocation();
       setCoords(coordinates);
-      setLoadingLoc(false);
     } catch (err) {
       console.warn('GPS ERROR', err);
-      setError(err.message || 'No se pudo obtener ubicación');
-      setLoadingLoc(false);
     }
   };
 
   const fetchAndSetWeather = async () => {
+    console.log("Actualizando datos...");
     if (!coords) return;
     setLoadingWx(true);
+    setRefreshing(true);
     try {
       const weatherData = await fetchWeatherData(coords);
       setWeather(weatherData);
@@ -72,9 +56,10 @@ const PanelAR = ({estado, setEstado}) => {
       setError('Error al obtener clima');
     } finally {
       setLoadingWx(false);
+      // Desactivar el estado de actualización después de un tiempo para mostrar animación
+      setTimeout(() => setRefreshing(false), 1000);
     }
   };
-
 
   // Configuración de materiales más atractivos
   ViroMaterials.createMaterials({
@@ -94,6 +79,15 @@ const PanelAR = ({estado, setEstado}) => {
       diffuseColor: "#2563EB", 
       lightingModel: "Constant", 
       opacity: 0.9
+    },
+    refreshButton: {
+      diffuseColor: "#9932FF", // Verde esmeralda
+      opacity: 0.9
+    },
+    refreshButtonPressed: {
+      diffuseColor: "#9932CC", // Verde más oscuro cuando está presionado
+      opacity: 1.0
+      
     }
   });
 
@@ -125,12 +119,12 @@ const PanelAR = ({estado, setEstado}) => {
     },
     pulseSize: [
       ["scaleUp", "scaleDown"]
-    ]
+    ],
   });
 
   return (
     <ViroARScene>
-      <ViroNode position={[0, 0, -7]} animation={{ name: "fadeIn", run: true, loop: false }}>
+      <ViroNode position={[0, 0, -4]} animation={{ name: "fadeIn", run: true, loop: false }}>
         {/* Panel principal con esquinas redondeadas */}
         <ViroBox
           position={[0, 0, 0]}
@@ -163,6 +157,25 @@ const PanelAR = ({estado, setEstado}) => {
           position={[0, 0.75, 0.05]}
           style={styles.headerText}
           width={5}
+          height={1}
+        />
+
+        {/* Botón de actualización manual */}
+        <ViroBox
+          position={[0, 1.35, 0.1]}
+          scale={[1, 0.4, 0]}
+          materials={[refreshing ? "refreshButtonPressed" : "refreshButton"]}
+          cornerRadius={0.05}
+          onClick={fetchAndSetWeather}
+        />
+        
+        {/* Ícono de actualización (texto simplificado, idealmente usarías una textura) */}
+        <ViroText
+          text={refreshing ? "Actualizando..." : "Actualizar"}
+          scale={[0.5, 0.5, 0.5]}
+          position={[0, 1.3, 0.2]}
+          style={styles.refreshIcon}
+          width={1}
           height={1}
         />
 
@@ -287,6 +300,14 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlignVertical: 'center',
     textAlign: 'center',
+  },
+  refreshIcon: {
+    fontFamily: 'Helvetica',
+    fontSize: 20,
+    color: 'white',
+    textAlignVertical: 'center',
+    textAlign: 'center',
+    fontWeight: 'bold',
   }
 });
 
